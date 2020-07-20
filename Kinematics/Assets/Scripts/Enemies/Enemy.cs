@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class Enemy : MonoBehaviour
     public Vector3 target = Vector3.zero;
     public float speed = 1f;
     private Vector3 direction = Vector3.zero;
+    public int pointValue = 10;
 
     private void Update()
     {
@@ -21,16 +23,17 @@ public class Enemy : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Destroy();
+        Deactivate();
     }
 
-    public void Destroy()
+    public void Deactivate()
     {
-        //calls to the dropController and sends it this enemies name???
-        //or should it be like level...
-
-
+        Death(pointValue);
+        Remove(gameObject);
         this.gameObject.SetActive(false);
-
     }
+
+    //event
+    public static event Action<int> Death;
+    public static event Action<GameObject> Remove;
 }

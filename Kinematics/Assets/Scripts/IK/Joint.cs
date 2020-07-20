@@ -35,11 +35,9 @@ public class Joint : MonoBehaviour
     //determine the rotation required to face child target
     public void CalcRotation()
     {
-        //target in world space...
-        float distance = (child.target - transform.position).magnitude;
         transform.rotation = Quaternion.Slerp(transform.rotation,
-                                              Quaternion.LookRotation(child.target - transform.position, transform.up),
-                                              (lerpSpeed * Time.fixedDeltaTime)/distance);
+                                              Quaternion.LookRotation(child.target - transform.position, transform.forward),
+                                              lerpSpeed * Time.fixedDeltaTime);
     }   
 
 

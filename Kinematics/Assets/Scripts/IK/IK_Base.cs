@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Boo.Lang;
+using System.Collections;
 using System.Collections.Generic;
 //using System.Numerics;
 using UnityEngine;
@@ -7,22 +8,59 @@ using UnityEngine;
 [RequireComponent(typeof(Joint))]
 public class IK_Base : MonoBehaviour
 {
-    public TargetPlayer targetPlayer;
-    public Vector3 target = Vector3.zero;
-    //public Transform target;
+    public GameObject jointPrefab;
+    public GameObject target = null;
     public Joint startJoint;
     public Joint endJoint;
     public bool baseMoves = false;
-    public float marginOfError = 0.1f;
+    public int numberOfJoints = 0;
+    
+
 
     private void Start()
     {
         //get start attached to this
         startJoint = GetComponent<Joint>();
+        endJoint = FindJoints();
+            
+    }
 
+    //if needing to attach joints
+    public void CreateJoint()
+    {
+        GameObject temp = Instantiate(jointPrefab, endJoint.transform);
+        temp.transform.localPosition = new Vector3(0, 0, 3);
+        temp.GetComponent<Joint>().parent = endJoint;
+        endJoint.child = temp.GetComponent<Joint>();
+        endJoint = endJoint.child;
+    }
+
+    public void IncreaseJointLength(float add)
+    {
+        Joint temp = startJoint.child;
+        while(temp != null)
+        {
+            temp.transform.localPosition += new Vector3(0, 0, add);
+            temp = temp.child;
+        }
+    }
+
+    public void IncreaseLerpSpeed(float add)
+    {
+        Joint temp = startJoint;
+        while (temp != null)
+        {
+            temp.lerpSpeed += add;
+            temp = temp.child;
+        }
+    }
+
+    //if already attached
+    private Joint FindJoints()
+    {
         //setup all joints
         Joint temp = startJoint;
-        while(true)
+        while (true)
         {
             for (int i = 0; i < temp.transform.childCount; i++)
             {
@@ -40,8 +78,7 @@ public class IK_Base : MonoBehaviour
             else { temp = temp.child; }
         }
 
-        //get endJoint, need for calculations
-        endJoint = temp;        
+        return temp;
     }
 
     private void Update()
@@ -56,36 +93,21 @@ public class IK_Base : MonoBehaviour
                 temp = temp.child;
             }
         }
+        if(Input.GetKeyUp(KeyCode.C))
+        {
+            CreateJoint();
+        }
     }
 
     private void FixedUpdate()
     {
-        if(target == Vector3.zero)
+        if(target == null || startJoint == endJoint)
         {
             return;
         }
 
         //update target of endEffector
-        endJoint.target = target;
-
-        //don't run when super close to target
-        if ((endJoint.target - endJoint.transform.position).magnitude < marginOfError)
-        {
-            if(targetPlayer.points.Count != 0)
-            {
-                targetPlayer.points.Dequeue();
-                if(targetPlayer.points.Count > 0)
-                {
-                    target = targetPlayer.points.Peek();
-                }                
-            }
-            else
-            {
-                target = Vector3.zero;
-            }
-
-            return;
-        }
+        endJoint.target = target.transform.position;
 
         Joint temp = endJoint.parent;
         while (temp != null)
@@ -105,22 +127,16 @@ public class IK_Base : MonoBehaviour
         }
     }
 
-    private void CheckIfNull()
+    private void SetTarget(GameObject target)
     {
-        if(target == Vector3.zero)
-        {
-            target = targetPlayer.points.Peek();
-        }
+        this.target = target;
     }
     
-    //sub to target player event to know if new targets available when 
-    //there are none 
+    //get updated targets from the radar subclass
     private void OnEnable()
     {
-        targetPlayer.click += CheckIfNull;
+        radar.NextTarget += SetTarget;
     }
-    private void OnDisable()
-    {
-        targetPlayer.click -= CheckIfNull;
-    }
+
+    public Radar radar;
 }

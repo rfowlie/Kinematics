@@ -32,7 +32,7 @@ public class Mine : MonoBehaviour
             {
                 if(hits[i].GetComponent<Enemy>())
                 {
-                    hits[i].GetComponent<Enemy>().Destroy();
+                    hits[i].GetComponent<Enemy>().Deactivate();
                 }
             }
 
