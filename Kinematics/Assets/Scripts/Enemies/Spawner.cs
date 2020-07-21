@@ -5,12 +5,20 @@ using UnityEngine;
 //use the center of the map and spawn at certain magnitude away, random x and y 
 public class Spawner : MonoBehaviour
 {
-    //public Vector3 spawnCenter = Vector3.zero;
     public float min = 5f;
     public float max = 8f;
     public GameObject enemyPrefab = null;
-    private List<GameObject> allEnemies = new List<GameObject>();
+    //active list
+    private List<GameObject> eA = new List<GameObject>();
+    //inactive queue
+    private Queue<GameObject> eI = new Queue<GameObject>();
     public bool isSpawn = false;
+
+
+    private void OnEnable()
+    {
+        Enemy.Remove += RemoveFromList;
+    }
 
     private void Start()
     {
@@ -21,6 +29,14 @@ public class Spawner : MonoBehaviour
             min = max;
             max = temp;
         }
+    }
+
+    private void RemoveFromList(GameObject obj)
+    {
+        eA.Remove(obj);
+        eI.Enqueue(obj);
+
+        obj.SetActive(false);
     }
 
     //get random vector coordinates within specified range
@@ -38,23 +54,23 @@ public class Spawner : MonoBehaviour
 
     private void SpawnEnemy()
     {
-        foreach (var e in allEnemies)
+        if(eI.Count > 0)
         {
-            if (e.gameObject.activeSelf == false)
-            {
-                //set position and set active
-                e.transform.position = CreateRandomPoint();
-                e.transform.rotation = Quaternion.LookRotation(transform.position - e.transform.position);
-                e.gameObject.SetActive(true);
-                return;
-            }
+            GameObject e = eI.Dequeue();
+            e.transform.position = CreateRandomPoint();
+            e.transform.rotation = Quaternion.LookRotation(transform.position - e.transform.position);
+            e.gameObject.SetActive(true);
+            eA.Add(e);
+            return;
         }
-
-        //create new enemy as none available
-        Vector3 temp = CreateRandomPoint();
-        allEnemies.Add(Instantiate(enemyPrefab,
-                                   temp,
-                                   Quaternion.LookRotation(transform.position - temp)));
+        //no available inactive enemy objects, create a new one
+        else
+        {
+            Vector3 temp = CreateRandomPoint();
+            eA.Add(Instantiate(enemyPrefab,
+                                       temp,
+                                       Quaternion.LookRotation(transform.position - temp)));
+        }        
     }
 
     public float spawnTime = 1.0f;

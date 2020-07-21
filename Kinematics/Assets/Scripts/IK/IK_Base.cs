@@ -8,52 +8,79 @@ using UnityEngine;
 [RequireComponent(typeof(Joint))]
 public class IK_Base : MonoBehaviour
 {
+    [Header("Variables")]
     public GameObject jointPrefab;
+    public Radar radar;
     public GameObject target = null;
     public Joint startJoint;
     public Joint endJoint;
-    public bool baseMoves = false;
-    public int numberOfJoints = 0;
+    public bool baseMoves = false;  
+
+    [Header("Improvement Values")]
+    public float baseLength = 1f;
+    public float incrementLength = 0.25f;
+    public float baseSpeed = 1f;
+    public float incrementSpeed = 0.25f;
+    public float baseRadar = 10f;
+    public float incrementRadar = 2f;
+
+    [Header("Levels")]
+    public int levelJoint = 1;
+    public int levelLength = 1;
+    public int levelSpeed = 1;
+    public int levelRadar = 1;
+
     
-
-
-    private void Start()
+    //get updated targets from the radar subclass
+    private void OnEnable()
     {
-        //get start attached to this
-        startJoint = GetComponent<Joint>();
-        endJoint = FindJoints();
-            
+        radar.NextTarget += SetTarget;
     }
-
     //if needing to attach joints
     public void CreateJoint()
     {
-        GameObject temp = Instantiate(jointPrefab, endJoint.transform);
-        temp.transform.localPosition = new Vector3(0, 0, 3);
-        temp.GetComponent<Joint>().parent = endJoint;
-        endJoint.child = temp.GetComponent<Joint>();
-        endJoint = endJoint.child;
-    }
+        levelJoint++;
 
-    public void IncreaseJointLength(float add)
+        GameObject temp = Instantiate(jointPrefab, endJoint.transform);
+        temp.transform.localPosition = new Vector3(0, 0, baseLength + incrementLength * levelLength);
+        Joint next = temp.GetComponent<Joint>();
+        next.parent = endJoint;
+        next.lerpSpeed = baseSpeed + levelSpeed * incrementSpeed;
+        endJoint.child = next;
+        endJoint = next;
+    }
+    public void IncreaseJointLength()
     {
+        levelLength++;
+
         Joint temp = startJoint.child;
         while(temp != null)
         {
-            temp.transform.localPosition += new Vector3(0, 0, add);
+            temp.transform.localPosition += new Vector3(0, 0, incrementLength);
             temp = temp.child;
         }
     }
-
-    public void IncreaseLerpSpeed(float add)
+    public void IncreaseLerpSpeed()
     {
+        levelSpeed++;
+
         Joint temp = startJoint;
         while (temp != null)
         {
-            temp.lerpSpeed += add;
+            temp.lerpSpeed += incrementSpeed;
             temp = temp.child;
         }
     }
+    public void IncreaseRadar()
+    {
+        levelRadar++;
+
+        radar.awarnessRadius += incrementRadar;
+    }
+
+
+
+
 
     //if already attached
     private Joint FindJoints()
@@ -81,6 +108,22 @@ public class IK_Base : MonoBehaviour
         return temp;
     }
 
+    private void SetTarget(GameObject target)
+    {
+        this.target = target;
+    }
+
+    
+
+
+    //******************************************
+    private void Start()
+    {
+        //get start attached to this
+        startJoint = GetComponent<Joint>();
+        endJoint = FindJoints();
+            
+    }
     private void Update()
     {
         //toggle gizmo's
@@ -98,7 +141,6 @@ public class IK_Base : MonoBehaviour
             CreateJoint();
         }
     }
-
     private void FixedUpdate()
     {
         if(target == null || startJoint == endJoint)
@@ -126,17 +168,4 @@ public class IK_Base : MonoBehaviour
                                                          startJoint.lerpSpeed * Time.fixedDeltaTime);        
         }
     }
-
-    private void SetTarget(GameObject target)
-    {
-        this.target = target;
-    }
-    
-    //get updated targets from the radar subclass
-    private void OnEnable()
-    {
-        radar.NextTarget += SetTarget;
-    }
-
-    public Radar radar;
 }

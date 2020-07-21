@@ -4,6 +4,8 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SocialPlatforms.Impl;
+using System;
+using UnityEditor.VersionControl;
 
 public class Points : MonoBehaviour
 {
@@ -14,6 +16,7 @@ public class Points : MonoBehaviour
     private void OnEnable()
     {
         Enemy.Death += IncrementScore;
+        UIFacade.Buy += DecrementScore;
     }
 
     private void Start()
@@ -22,17 +25,27 @@ public class Points : MonoBehaviour
         text.text = score.ToString();
     }
 
+    public static event Action<int> Reevaluate;
+
     //get points
     public void IncrementScore(int amount)
     {
         score += amount;
         text.text = score.ToString();
+        if(Reevaluate != null)
+        {
+            Reevaluate(score);
+        }
     }
     //spend points
     public void DecrementScore(int amount)
     {
         //potentially do checks here
-        score += amount;
+        score -= amount;
         text.text = score.ToString();
+        if (Reevaluate != null)
+        {
+            Reevaluate(score);
+        }
     }
 }

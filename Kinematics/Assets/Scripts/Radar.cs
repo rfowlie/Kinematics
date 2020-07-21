@@ -30,7 +30,6 @@ public class Radar : MonoBehaviour
         sc.radius = awarnessRadius;
     }
 
-
     private void CheckList(GameObject obj)
     {
         if (enemies.Contains(obj))
@@ -73,12 +72,14 @@ public class Radar : MonoBehaviour
         }
     }
 
+    //MIGHT NEED EXIT
+
 
     //Debug
     public Color gizmosColour = Color.white;
     private void OnDrawGizmos()
     {
         Gizmos.color = gizmosColour;
-        Gizmos.DrawWireSphere(transform.position, sc.radius);
+        Gizmos.DrawWireSphere(transform.position, awarnessRadius);
     }
 }

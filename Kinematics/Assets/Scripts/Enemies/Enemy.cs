@@ -30,7 +30,6 @@ public class Enemy : MonoBehaviour
     {
         Death(pointValue);
         Remove(gameObject);
-        this.gameObject.SetActive(false);
     }
 
     //event

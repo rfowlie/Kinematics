@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.PerformanceData;
 using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEditor.Animations;
@@ -20,9 +21,14 @@ public class TargetPlayer : Target
     public GameObject bulletPrefab;
     public GameObject minePrefab;
 
+    [Tooltip("Number of bullets per second")]
+    public int fireRate = 1;
+    public float fireSpeed = 0;
+
     private void Start()
     {
         ip = InputManager.Instance;
+        fireSpeed = 1f / fireRate;
     }
 
     private void Update()
@@ -37,9 +43,15 @@ public class TargetPlayer : Target
         angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         
         //shoot
-        if(Input.GetMouseButtonUp(0))
+        if(Input.GetMouseButtonDown(0))
         {
-            ShootBullet();
+            isShooting = true;
+            c = StartCoroutine(Shooting());
+        }
+        else if(Input.GetMouseButtonUp(0))
+        {
+            isShooting = false;
+            c = null;
         }
 
         //mine
@@ -70,6 +82,24 @@ public class TargetPlayer : Target
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
+    Coroutine c = null;
+    private float count = 0f;
+    IEnumerator Shooting()
+    {
+        while(isShooting)
+        {
+            count -= Time.deltaTime;
+            if(count < 0f)
+            {
+                ShootBullet();
+                count = fireSpeed;
+            }
+
+            yield return null;
+        }
+    }
+
+    private bool isShooting = false;
     private void ShootBullet()
     {
         Instantiate(bulletPrefab, transform.position + transform.right * 3, transform.rotation);

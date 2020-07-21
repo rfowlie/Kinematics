@@ -14,12 +14,12 @@ using UnityEngine.UIElements;
 //requires setup in the editor to ensure proper retention of dimensions
 public class Joint : MonoBehaviour
 {
+    [Header("Variables")]
     public Joint parent, child;
     public Vector3 target;
-    [Range(0.01f, 20f)]
     public float lerpSpeed = 1f;
 
-    [Header("Debug")]
+    [Header("Gizmos")]
     public bool gizmosOn = false;
     public Color gizmoColor = Color.white;
     public float gizmoSize = 0.2f;
@@ -40,7 +40,7 @@ public class Joint : MonoBehaviour
                                               lerpSpeed * Time.fixedDeltaTime);
     }   
 
-
+    //debug
     private void OnDrawGizmos()
     {
         Gizmos.color = gizmoColor;
