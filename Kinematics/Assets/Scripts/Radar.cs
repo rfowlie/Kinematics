@@ -48,7 +48,11 @@ public class Radar : MonoBehaviour
     {
         foreach (GameObject e in enemies)
         {
-            if (e.activeSelf)
+            if(e == null)
+            {
+                enemies.Remove(e);
+            }
+            else if (e.activeSelf)
             {
                 return e;
             }
