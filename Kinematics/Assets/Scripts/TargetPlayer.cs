@@ -9,7 +9,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.U2D;
 
-public class TargetPlayer : Target
+public class TargetPlayer : Target, IDamagable
 {
     InputManager ip = null;
 
@@ -29,6 +29,7 @@ public class TargetPlayer : Target
     {
         ip = InputManager.Instance;
         fireSpeed = 1f / fireRate;
+        healthCurrent = healthMax;
     }
 
     private void Update()
@@ -109,6 +110,41 @@ public class TargetPlayer : Target
         Instantiate(minePrefab, transform.position, Quaternion.identity);
     }
 
+    //DAMAGE
+    public int healthMax = 3;
+    public int healthCurrent;
+    public LayerMask canDamage;
+    public static event Action playerDead;
+    public void Damage()
+    {
+        healthCurrent--;
+        if(healthCurrent <= 0)
+        {
+            if (playerDead != null)
+            {
+                playerDead();
+            }
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (LayerMaskEX.IsInLayerMask(collision.gameObject.layer, canDamage))
+        {
+            Damage();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+    //DEBUG
     //array of points that the IK will go too
     public Color pointColour = Color.red;
     public float pointRadius = 1f;

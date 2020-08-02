@@ -126,3 +126,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {x: 0, y: 0, z: 0}
   speed: 2
+  pointValue: 10
+  canDamage:
+    serializedVersion: 2
+    m_Bits: 536870912

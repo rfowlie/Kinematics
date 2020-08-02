@@ -2,22 +2,56 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//work in progress....
+public class Pooler : MonoBehaviour
+{
+    public GameObject prefab;
+    public List<GameObject> active = new List<GameObject>();
+    public Queue<GameObject> available = new Queue<GameObject>();
+
+    public void RemoveFromList(GameObject obj)
+    {
+        if(active.Contains(obj))
+        {
+            active.Remove(obj);
+            available.Enqueue(obj);
+            obj.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("This object was not in the active list, something went wrong!!");
+        }        
+    }
+
+    public GameObject GetAvailable()
+    {
+        if(available.Count > 0)
+        {
+            return available.Dequeue();
+        }
+        else
+        {
+            return Instantiate(prefab, Vector3.zero, Quaternion.identity);
+        }
+    }
+}
+
 //use the center of the map and spawn at certain magnitude away, random x and y 
 public class Spawner : MonoBehaviour
 {
     public float min = 5f;
     public float max = 8f;
-    public GameObject enemyPrefab = null;
+    public GameObject prefab = null;
     //active list
-    private List<GameObject> eA = new List<GameObject>();
+    private List<GameObject> active = new List<GameObject>();
     //inactive queue
-    private Queue<GameObject> eI = new Queue<GameObject>();
+    private Queue<GameObject> available = new Queue<GameObject>();
     public bool isSpawn = false;
 
 
     private void OnEnable()
     {
-        Enemy.Remove += RemoveFromList;
+        Enemy.Recycle += RemoveFromList;
     }
 
     private void Start()
@@ -31,12 +65,39 @@ public class Spawner : MonoBehaviour
         }
     }
 
-    private void RemoveFromList(GameObject obj)
+    public void RemoveFromList(GameObject obj)
     {
-        eA.Remove(obj);
-        eI.Enqueue(obj);
+        if (active.Contains(obj))
+        {
+            active.Remove(obj);
+            available.Enqueue(obj);
+            obj.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("This object was not in the active list, something went wrong!!");
+        }
+    }
 
-        obj.SetActive(false);
+    public GameObject GetAvailable()
+    {
+        if (available.Count > 0)
+        {
+            return available.Dequeue();
+        }
+        else
+        {
+            return Instantiate(prefab, Vector3.zero, Quaternion.identity);
+        }
+    }
+    
+    private void SpawnEnemy()
+    {
+        GameObject e = GetAvailable();
+        e.transform.position = CreateRandomPoint();
+        e.transform.rotation = Quaternion.LookRotation(transform.position - e.transform.position);
+        e.gameObject.SetActive(true);
+        active.Add(e);
     }
 
     //get random vector coordinates within specified range
@@ -52,26 +113,6 @@ public class Spawner : MonoBehaviour
         return transform.forward * distance;
     }
 
-    private void SpawnEnemy()
-    {
-        if(eI.Count > 0)
-        {
-            GameObject e = eI.Dequeue();
-            e.transform.position = CreateRandomPoint();
-            e.transform.rotation = Quaternion.LookRotation(transform.position - e.transform.position);
-            e.gameObject.SetActive(true);
-            eA.Add(e);
-            return;
-        }
-        //no available inactive enemy objects, create a new one
-        else
-        {
-            Vector3 temp = CreateRandomPoint();
-            eA.Add(Instantiate(enemyPrefab,
-                                       temp,
-                                       Quaternion.LookRotation(transform.position - temp)));
-        }        
-    }
 
     public float spawnTime = 1.0f;
     private float count = 0f;

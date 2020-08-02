@@ -20,7 +20,7 @@ public class Radar : MonoBehaviour
 
     private void OnEnable()
     {
-        Enemy.Remove += CheckList;
+        Enemy.Recycle += CheckList;
     }
 
     private void Start()

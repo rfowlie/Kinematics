@@ -15,7 +15,7 @@ public class UIFacade : MonoBehaviour
     {
         UITrigger.Enter += SetCurrentBase;
         UITrigger.Exit += RemoveBase;
-        Points.Reevaluate += GetScore;
+        Score.Reevaluate += GetScore;
     }
 
     private void SetCurrentBase(IK_Base newBase)
