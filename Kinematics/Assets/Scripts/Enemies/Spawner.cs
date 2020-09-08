@@ -2,9 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//things that will be an object that needs pooling
+public class PoolObject : MonoBehaviour
+{
+    public Pooler pooler;
+}
+
 //work in progress....
 public class Pooler : MonoBehaviour
 {
+    //constructor
+    public Pooler(GameObject prefab)
+    {
+        this.prefab = prefab;
+    }
+
     public GameObject prefab;
     public List<GameObject> active = new List<GameObject>();
     public Queue<GameObject> available = new Queue<GameObject>();
@@ -31,7 +43,9 @@ public class Pooler : MonoBehaviour
         }
         else
         {
-            return Instantiate(prefab, Vector3.zero, Quaternion.identity);
+            GameObject temp = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+            active.Add(temp);
+            return temp; 
         }
     }
 }

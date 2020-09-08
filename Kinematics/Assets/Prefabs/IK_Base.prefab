@@ -255,9 +255,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jointPrefab: {fileID: 1314374224320450767, guid: 826c3f502788b2345b299061ee6b8230,
     type: 3}
+  radar: {fileID: 7881228594685631106}
   target: {fileID: 0}
   startJoint: {fileID: 0}
   endJoint: {fileID: 0}
   baseMoves: 0
-  numberOfJoints: 0
-  radar: {fileID: 7881228594685631106}
+  baseLength: 1
+  incrementLength: 0.25
+  baseSpeed: 1
+  incrementSpeed: 0.25
+  baseRadar: 10
+  incrementRadar: 2
+  levelJoint: 1
+  levelLength: 1
+  levelSpeed: 1
+  levelRadar: 1

@@ -11,13 +11,16 @@ using UnityEngine.U2D;
 
 public class TargetPlayer : Target, IDamagable
 {
-    InputManager ip = null;
+    private Pooler bulletPooler;
 
+    InputManager ip = null;
+    public bool canMove = true;
     public float speed = 1.0f;
     private float h = 0f;
     private float v = 0f;
     private float angle = 0f;
 
+    public GameObject basePrefab;
     public GameObject bulletPrefab;
     public GameObject minePrefab;
 
@@ -27,6 +30,9 @@ public class TargetPlayer : Target, IDamagable
 
     private void Start()
     {
+        //bullet pool
+        bulletPooler = new Pooler(bulletPrefab);
+
         ip = InputManager.Instance;
         fireSpeed = 1f / fireRate;
         healthCurrent = healthMax;
@@ -65,18 +71,28 @@ public class TargetPlayer : Target, IDamagable
                 click();
             }
         }
+
+        //base
+        if (Input.GetKeyUp(KeyCode.F))
+        {
+            //canMove = false;
+            Instantiate(basePrefab, transform.position, Quaternion.identity);
+        }
     }
 
     private void FixedUpdate()
     {
         //move
-        if (h != 0)
+        if(canMove)
         {
-            transform.position += Vector3.right * h * speed * Time.fixedDeltaTime;
-        }
-        if (v != 0)
-        {
-            transform.position += Vector3.up * v * speed * Time.fixedDeltaTime;
+            if (h != 0)
+            {
+                transform.position += Vector3.right * h * speed * Time.fixedDeltaTime;
+            }
+            if (v != 0)
+            {
+                transform.position += Vector3.up * v * speed * Time.fixedDeltaTime;
+            }
         }
 
         //rotate
@@ -103,7 +119,9 @@ public class TargetPlayer : Target, IDamagable
     private bool isShooting = false;
     private void ShootBullet()
     {
-        Instantiate(bulletPrefab, transform.position + transform.right * 3, transform.rotation);
+        GameObject temp = bulletPooler.GetAvailable();
+        temp.transform.position = transform.position + transform.right * 3;
+        temp.transform.rotation = transform.rotation;
     }
     private void CreateMine()
     {

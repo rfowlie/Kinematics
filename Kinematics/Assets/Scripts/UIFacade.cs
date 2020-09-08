@@ -8,7 +8,13 @@ using UnityEngine;
 public class UIFacade : MonoBehaviour
 {
     public Canvas canvas;
-    public IK_Base currentBase;   
+    public IK_Base currentBase;
+
+    private void Start()
+    {
+        //make sure that UI is null at first
+        RemoveBase();
+    }
 
 
     private void OnEnable()
