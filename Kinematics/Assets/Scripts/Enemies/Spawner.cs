@@ -53,8 +53,8 @@ public class Pooler : MonoBehaviour
 //use the center of the map and spawn at certain magnitude away, random x and y 
 public class Spawner : MonoBehaviour
 {
-    public float min = 5f;
-    public float max = 8f;
+    public float minDistance = 5f;
+    public float maxDistance = 8f;
     public GameObject prefab = null;
     //active list
     private List<GameObject> active = new List<GameObject>();
@@ -71,11 +71,11 @@ public class Spawner : MonoBehaviour
     private void Start()
     {
         //check if min and max are correct
-        if(min > max)
+        if(minDistance > maxDistance)
         {
-            float temp = min;
-            min = max;
-            max = temp;
+            float temp = minDistance;
+            minDistance = maxDistance;
+            maxDistance = temp;
         }
     }
 
@@ -122,7 +122,7 @@ public class Spawner : MonoBehaviour
         //rotate this
         transform.eulerAngles = new Vector3(angle, 90, 0);
         //get length
-        float distance = Random.Range(min, max);
+        float distance = Random.Range(minDistance, maxDistance);
         //spawn 
         return transform.forward * distance;
     }

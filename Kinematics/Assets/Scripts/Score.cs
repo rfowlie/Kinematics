@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SocialPlatforms.Impl;
 using System;
-using UnityEditor.VersionControl;
+//using UnityEditor.VersionControl;
 
 public class Score : MonoBehaviour
 {

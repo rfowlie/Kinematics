@@ -1,11 +1,10 @@
-﻿using Boo.Lang;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.PerformanceData;
+//using System.Diagnostics.PerformanceData;
 using System.Linq;
 using System.Runtime.InteropServices;
-using UnityEditor.Animations;
+//using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.U2D;
 

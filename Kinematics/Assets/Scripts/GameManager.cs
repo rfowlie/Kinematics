@@ -12,6 +12,6 @@ public class GameManager : MonoBehaviour
         BaseManager.gameOver += ReturnToMainMenu;
     }
 
-    private void ReturnToMainMenu() => SceneManager.LoadScene(0);
+    private void ReturnToMainMenu() => UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     private void PauseGame() => Time.timeScale = 0;
 }

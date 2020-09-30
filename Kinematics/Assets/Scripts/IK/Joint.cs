@@ -15,7 +15,8 @@ using UnityEngine.UIElements;
 public class Joint : MonoBehaviour
 {
     [Header("Variables")]
-    public Joint parent, child;
+    public Joint parent;
+    public Joint child;
     public Vector3 target;
     public float lerpSpeed = 1f;
 

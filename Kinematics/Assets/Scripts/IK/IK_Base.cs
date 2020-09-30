@@ -1,5 +1,4 @@
-﻿using Boo.Lang;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 //using System.Numerics;
 using UnityEngine;
@@ -49,6 +48,19 @@ public class IK_Base : MonoBehaviour
         endJoint.child = next;
         endJoint = next;
     }
+    public void RemoveJoint()
+    {
+        if(levelJoint > 1)
+        {
+            levelJoint--;
+
+            //remove last joint...        
+            Joint parent = endJoint.parent;
+            Destroy(endJoint.gameObject);
+            endJoint = parent;
+            endJoint.child = null;
+        }
+    }
     public void IncreaseJointLength()
     {
         levelLength++;
@@ -58,6 +70,19 @@ public class IK_Base : MonoBehaviour
         {
             temp.transform.localPosition += new Vector3(0, 0, incrementLength);
             temp = temp.child;
+        }
+    }
+    public void DecreaseLength()
+    {
+        if(levelLength > 1)
+        {
+            levelLength--;
+            Joint temp = startJoint.child;
+            while (temp != null)
+            {
+                temp.transform.localPosition -= new Vector3(0, 0, incrementLength);
+                temp = temp.child;
+            }
         }
     }
     public void IncreaseLerpSpeed()
@@ -71,14 +96,32 @@ public class IK_Base : MonoBehaviour
             temp = temp.child;
         }
     }
+    public void DecreaseLerpSpeed()
+    {
+        if(levelSpeed > 1)
+        {
+            levelSpeed--;
+            Joint temp = startJoint;
+            while (temp != null)
+            {
+                temp.lerpSpeed -= incrementSpeed;
+                temp = temp.child;
+            }
+        }
+    }
     public void IncreaseRadar()
     {
         levelRadar++;
-
-        radar.awarnessRadius += incrementRadar;
+        radar.AdjustRadius(incrementRadar);
     }
-
-
+    public void DecreaseRadar()
+    {
+        if(levelRadar > 1)
+        {
+            levelRadar--;
+            radar.AdjustRadius(-incrementRadar);
+        }
+    }
 
 
 
@@ -107,14 +150,11 @@ public class IK_Base : MonoBehaviour
 
         return temp;
     }
-
     private void SetTarget(GameObject target)
     {
         this.target = target;
     }
-
-    
-
+      
 
     //******************************************
     private void Start()
